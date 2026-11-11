@@ -22,6 +22,22 @@ public class PropertyService {
         return repository.findAll(Sort.by("reference"));
     }
 
+    public List<Property> search (String city, Integer maxRent) {
+        if (city != null && maxRent != null) {
+            return repository.findByAddressCityIgnoreCaseAndMonthlyRentLessThanEqualOrderByReference(city, maxRent);
+        }
+
+        if (city != null) {
+            return repository.findByAddressCityIgnoreCaseOrderByReference(city);
+        }
+
+        if (maxRent != null) {
+            return repository.findByMonthlyRentLessThanEqualOrderByReference(maxRent);
+        }
+
+        return findAll();
+    }
+
     public Optional<Property> findByReference(String ref) {
         return repository.findByReference(ref);
     }
