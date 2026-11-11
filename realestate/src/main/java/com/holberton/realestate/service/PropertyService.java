@@ -1,50 +1,42 @@
 package com.holberton.realestate.service;
 
 import com.holberton.realestate.dto.PropertyRequest;
-import com.holberton.realestate.model.Address;
-import com.holberton.realestate.model.EnergyClass;
+import com.holberton.realestate.repository.PropertyRepository;
 import com.holberton.realestate.model.Property;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Sort;
 
 @Service
 public class PropertyService {
-    private final List<Property> properties = new ArrayList<>();
+    private final PropertyRepository repository;
 
-    public PropertyService() {
-        properties.add(new Property("P-001", new Address("12 Rue de la Paix", "75002", "Paris"),
-            25, 950, EnergyClass.D));
-        properties.add(new Property("P-002", new Address("8 Chemin des Vignes", "33000", "Bordeaux"),
-            120, 1800, EnergyClass.B));
-        properties.add(new Property("P-003", new Address("1 Place Bellecour", "69002", "Lyon"),
-            80, 2500, EnergyClass.C));
+    public PropertyService(PropertyRepository repository) {
+        this.repository = repository;
     }
 
     public List<Property> findAll() {
-        return properties.stream()
-        .sorted(Comparator.comparing(Property::getReference))
-        .toList();
+        return repository.findAll(Sort.by("reference"));
     }
 
-    public Optional<Property> findByReference(String reference) {
-        return properties.stream()
-        .filter(p -> p.getReference().equals(reference))
-        .findFirst();
+    public Optional<Property> findByReference(String ref) {
+        return repository.findByReference(ref);
     }
 
-    public Optional<Property> create(PropertyRequest request) {
-        if (findByReference(request.reference()).isPresent()) {
-            return Optional.empty();
-        }
-        Property property = new Property(request.reference(), request.address(), request.surface(),
-            request.monthlyRent(), request.energyClass());
-        properties.add(property);
-        return Optional.of(property);
+    public Optional<Property> create(PropertyRequest req) {
+        if (repository.existsByReference(req.reference())) return Optional.empty();
+
+        Property property = new Property(
+            req.reference(),
+            req.address(),
+            req.surface(),
+            req.monthlyRent(),
+            req.energyClass()
+        );
+        return Optional.of(repository.save(property));
     }
 
     public Optional<Property> update(String reference, PropertyRequest request) {
@@ -54,11 +46,13 @@ public class PropertyService {
             p.setSurface(request.surface());
             p.setMonthlyRent(request.monthlyRent());
             p.setEnergyClass(request.energyClass());
+
+            repository.save(p);
         });
         return found;
     }
 
-    public boolean delete(String reference) {
-        return properties.removeIf(p -> p.getReference().equals(reference));
+    public boolean delete(String ref) {
+        return repository.findByReference(ref).map(p -> { repository.delete(p); return true; }).orElse(false);
     }
 }
