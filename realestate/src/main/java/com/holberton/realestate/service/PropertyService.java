@@ -1,6 +1,8 @@
 package com.holberton.realestate.service;
 
 import com.holberton.realestate.dto.PropertyRequest;
+import com.holberton.realestate.dto.PropertyResponse;
+import com.holberton.realestate.dto.PropertyMapper;
 import com.holberton.realestate.repository.PropertyRepository;
 import com.holberton.realestate.model.Property;
 
@@ -18,54 +20,53 @@ public class PropertyService {
         this.repository = repository;
     }
 
-    public List<Property> findAll() {
-        return repository.findAll(Sort.by("reference"));
+    public List<PropertyResponse> findAll() {
+        return repository.findAll(Sort.by("reference")).stream().map(PropertyMapper::toResponse).toList();
     }
 
-    public List<Property> search (String city, Integer maxRent) {
+    public List<PropertyResponse> search (String city, Integer maxRent) {
+        List<Property> result = null;
+
         if (city != null && maxRent != null) {
-            return repository.findByAddressCityIgnoreCaseAndMonthlyRentLessThanEqualOrderByReference(city, maxRent);
+            result = repository.findByAddressCityIgnoreCaseAndMonthlyRentLessThanEqualOrderByReference(city, maxRent);
         }
-
-        if (city != null) {
-            return repository.findByAddressCityIgnoreCaseOrderByReference(city);
+        else if (city != null) {
+            result = repository.findByAddressCityIgnoreCaseOrderByReference(city);
         }
-
-        if (maxRent != null) {
-            return repository.findByMonthlyRentLessThanEqualOrderByReference(maxRent);
+        else if (maxRent != null) {
+            result = repository.findByMonthlyRentLessThanEqualOrderByReference(maxRent);
         }
-
-        return findAll();
+        else return findAll();
+        
+        return result
+        .stream()
+        .map(PropertyMapper::toResponse)
+        .toList();
     }
 
-    public Optional<Property> findByReference(String ref) {
-        return repository.findByReference(ref);
+    public Optional<PropertyResponse> findByReference(String ref) {
+        return repository.findByReference(ref)
+            .map(PropertyMapper::toResponse);
     }
 
-    public Optional<Property> create(PropertyRequest req) {
+    public Optional<PropertyResponse> create(PropertyRequest req) {
         if (repository.existsByReference(req.reference())) return Optional.empty();
 
-        Property property = new Property(
-            req.reference(),
-            req.address(),
-            req.surface(),
-            req.monthlyRent(),
-            req.energyClass()
-        );
-        return Optional.of(repository.save(property));
+        Property entity = PropertyMapper.toEntity(req);
+
+        return Optional.of(PropertyMapper.toResponse(repository.save(entity)));
     }
 
-    public Optional<Property> update(String reference, PropertyRequest request) {
-        Optional<Property> found = findByReference(reference);
-        found.ifPresent(p -> {
-            p.setAddress(request.address());
-            p.setSurface(request.surface());
-            p.setMonthlyRent(request.monthlyRent());
-            p.setEnergyClass(request.energyClass());
-
-            repository.save(p);
-        });
-        return found;
+    public Optional<PropertyResponse> update(String reference, PropertyRequest request) {
+        return repository.findByReference(reference).map(
+            p -> {
+                p.setAddress(request.address());
+                p.setSurface(request.surface());
+                p.setMonthlyRent(request.monthlyRent());
+                p.setEnergyClass(request.energyClass());
+                return PropertyMapper.toResponse(repository.save(p));
+            }
+        );
     }
 
     public boolean delete(String ref) {

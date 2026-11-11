@@ -1,7 +1,7 @@
 package com.holberton.realestate.controller;
 
 import com.holberton.realestate.dto.PropertyRequest;
-import com.holberton.realestate.model.Property;
+import com.holberton.realestate.dto.PropertyResponse;
 import com.holberton.realestate.service.PropertyService;
 
 import java.net.URI;
@@ -28,27 +28,27 @@ public class PropertyController {
     }
 
     @GetMapping
-    public List<Property> search(@RequestParam(required = false) String city, @RequestParam(required = false) Integer maxRent) {
+    public List<PropertyResponse> search(@RequestParam(required = false) String city, @RequestParam(required = false) Integer maxRent) {
         return service.search(city, maxRent);
     }
 
     @GetMapping("/{reference}")
-    public ResponseEntity<Property> findByReference(@PathVariable String reference) {
+    public ResponseEntity<PropertyResponse> findByReference(@PathVariable String reference) {
         return service.findByReference(reference)
         .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Property> create(@RequestBody PropertyRequest request) {
+    public ResponseEntity<PropertyResponse> create(@RequestBody PropertyRequest request) {
         return service.create(request)
-        .map(p -> ResponseEntity.created(URI.create("/api/properties/" + p.getReference()))
+        .map(p -> ResponseEntity.created(URI.create("/api/properties/" + p.reference()))
             .body(p))
         .orElseGet(() -> ResponseEntity.status(409).build());
     }
 
     @PutMapping("/{reference}")
-    public ResponseEntity<Property> update(@PathVariable String reference,
+    public ResponseEntity<PropertyResponse> update(@PathVariable String reference,
         @RequestBody PropertyRequest request) {
         return service.update(reference, request)
         .map(ResponseEntity::ok)
