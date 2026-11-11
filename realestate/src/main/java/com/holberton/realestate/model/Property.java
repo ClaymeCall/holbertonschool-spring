@@ -1,11 +1,27 @@
 package com.holberton.realestate.model;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "properties")
 public class Property {
-  private final String reference;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  @Column(nullable = false, unique = true)
+  private String reference;
+
+  @Embedded
   private Address address;
+
   private int surface;
   private int monthlyRent;
+
+  @Enumerated(EnumType.STRING)
   private EnergyClass energyClass;
+
+  protected Property() {}
 
   public Property(String reference, Address address, int surface, int monthlyRent,
       EnergyClass energyClass) {
@@ -16,39 +32,23 @@ public class Property {
     this.energyClass = energyClass;
   }
 
-  public String getReference() {
-    return reference;
-  }
+  public Long getId() { return id; }
 
-  public Address getAddress() {
-    return address;
-  }
+  public String getReference() { return reference; }
 
-  public void setAddress(Address address) {
-    this.address = address;
-  }
+  public Address getAddress() { return address; }
 
-  public int getSurface() {
-    return surface;
-  }
+  public void setAddress(Address address) { this.address = address; }
 
-  public void setSurface(int surface) {
-    this.surface = surface;
-  }
+  public int getSurface() { return surface; }
 
-  public int getMonthlyRent() {
-    return monthlyRent;
-  }
+  public void setSurface(int surface) { this.surface = surface; }
 
-  public void setMonthlyRent(int monthlyRent) {
-    this.monthlyRent = monthlyRent;
-  }
+  public int getMonthlyRent() { return monthlyRent; }
 
-  public EnergyClass getEnergyClass() {
-    return energyClass;
-  }
+  public void setMonthlyRent(int monthlyRent) { this.monthlyRent = monthlyRent; }
 
-  public void setEnergyClass(EnergyClass energyClass) {
-    this.energyClass = energyClass;
-  }
+  public EnergyClass getEnergyClass() { return energyClass; }
+
+  public void setEnergyClass(EnergyClass energyClass) { this.energyClass = energyClass; }
 }
