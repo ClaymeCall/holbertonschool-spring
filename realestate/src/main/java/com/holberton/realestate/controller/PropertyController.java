@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/properties")
 public class PropertyController {
@@ -40,7 +42,7 @@ public class PropertyController {
     }
 
     @PostMapping
-    public ResponseEntity<PropertyResponse> create(@RequestBody PropertyRequest request) {
+    public ResponseEntity<PropertyResponse> create(@Valid @RequestBody PropertyRequest request) {
         return service.create(request)
         .map(p -> ResponseEntity.created(URI.create("/api/properties/" + p.reference()))
             .body(p))
@@ -49,7 +51,7 @@ public class PropertyController {
 
     @PutMapping("/{reference}")
     public ResponseEntity<PropertyResponse> update(@PathVariable String reference,
-        @RequestBody PropertyRequest request) {
+        @Valid @RequestBody PropertyRequest request) {
         return service.update(reference, request)
         .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.notFound().build());

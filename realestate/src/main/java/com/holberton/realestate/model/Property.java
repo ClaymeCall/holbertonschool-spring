@@ -1,6 +1,8 @@
 package com.holberton.realestate.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import jakarta.validation.Valid;
 
 @Entity
 @Table(name = "properties")
@@ -9,17 +11,16 @@ public class Property {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String reference;
+    @Column(nullable = false, unique = true) private String reference;
 
     @Embedded
     private Address address;
 
-    private int surface;
-    private int monthlyRent;
+    @Column(nullable = false) private int surface;
+    @Column(nullable = false) private int monthlyRent;
 
     @Enumerated(EnumType.STRING)
-    private EnergyClass energyClass;
+    @Column(nullable = false) private EnergyClass energyClass;
 
     protected Property() {}
 
