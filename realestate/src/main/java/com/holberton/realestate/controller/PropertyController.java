@@ -20,44 +20,44 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/properties")
 public class PropertyController {
-  private final PropertyService service;
+    private final PropertyService service;
 
-  public PropertyController(PropertyService service) {
-    this.service = service;
-  }
+    public PropertyController(PropertyService service) {
+        this.service = service;
+    }
 
-  @GetMapping
-  public List<Property> findAll() {
-    return service.findAll();
-  }
+    @GetMapping
+    public List<Property> findAll() {
+        return service.findAll();
+    }
 
-  @GetMapping("/{reference}")
-  public ResponseEntity<Property> findByReference(@PathVariable String reference) {
-    return service.findByReference(reference)
+    @GetMapping("/{reference}")
+    public ResponseEntity<Property> findByReference(@PathVariable String reference) {
+        return service.findByReference(reference)
         .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.notFound().build());
-  }
+    }
 
-  @PostMapping
-  public ResponseEntity<Property> create(@RequestBody PropertyRequest request) {
-    return service.create(request)
+    @PostMapping
+    public ResponseEntity<Property> create(@RequestBody PropertyRequest request) {
+        return service.create(request)
         .map(p -> ResponseEntity.created(URI.create("/api/properties/" + p.getReference()))
             .body(p))
         .orElseGet(() -> ResponseEntity.status(409).build());
-  }
+    }
 
-  @PutMapping("/{reference}")
-  public ResponseEntity<Property> update(@PathVariable String reference,
-      @RequestBody PropertyRequest request) {
-    return service.update(reference, request)
+    @PutMapping("/{reference}")
+    public ResponseEntity<Property> update(@PathVariable String reference,
+        @RequestBody PropertyRequest request) {
+        return service.update(reference, request)
         .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.notFound().build());
-  }
+    }
 
-  @DeleteMapping("/{reference}")
-  public ResponseEntity<Void> delete(@PathVariable String reference) {
-    return service.delete(reference)
+    @DeleteMapping("/{reference}")
+    public ResponseEntity<Void> delete(@PathVariable String reference) {
+        return service.delete(reference)
         ? ResponseEntity.noContent().build()
         : ResponseEntity.notFound().build();
-  }
+    }
 }
