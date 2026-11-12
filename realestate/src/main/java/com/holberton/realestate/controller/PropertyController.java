@@ -46,7 +46,7 @@ public class PropertyController {
         PropertyResponse created = service.create(request);
 
         return ResponseEntity
-            .created(URI.create("/api/properties" + created.reference()))
+            .created(URI.create("/api/properties/" + created.reference()))
             .body(created);
     }
 
