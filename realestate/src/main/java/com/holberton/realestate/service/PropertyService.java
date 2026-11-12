@@ -5,6 +5,7 @@ import com.holberton.realestate.dto.PropertyResponse;
 import com.holberton.realestate.dto.PropertyMapper;
 import com.holberton.realestate.repository.PropertyRepository;
 import com.holberton.realestate.model.Property;
+import com.holberton.realestate.exception.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,20 +45,23 @@ public class PropertyService {
         .toList();
     }
 
-    public Optional<PropertyResponse> findByReference(String ref) {
+    public PropertyResponse findByReference(String ref) {
         return repository.findByReference(ref)
-            .map(PropertyMapper::toResponse);
+            .map(PropertyMapper::toResponse)
+            .orElseThrow(() -> new PropertyNotFoundException(ref));
     }
 
-    public Optional<PropertyResponse> create(PropertyRequest req) {
-        if (repository.existsByReference(req.reference())) return Optional.empty();
+    public PropertyResponse create(PropertyRequest req) {
+        if (repository.existsByReference(req.reference())){
+            throw new DuplicateReferenceException(req.reference());
+        }
 
         Property entity = PropertyMapper.toEntity(req);
 
-        return Optional.of(PropertyMapper.toResponse(repository.save(entity)));
+        return PropertyMapper.toResponse(repository.save(entity));
     }
 
-    public Optional<PropertyResponse> update(String reference, PropertyRequest request) {
+    public PropertyResponse update(String reference, PropertyRequest request) {
         return repository.findByReference(reference).map(
             p -> {
                 p.setAddress(request.address());
@@ -66,10 +70,14 @@ public class PropertyService {
                 p.setEnergyClass(request.energyClass());
                 return PropertyMapper.toResponse(repository.save(p));
             }
-        );
+        )
+        .orElseThrow(() -> (new PropertyNotFoundException(reference)));
     }
 
-    public boolean delete(String ref) {
-        return repository.findByReference(ref).map(p -> { repository.delete(p); return true; }).orElse(false);
+    public void delete(String ref) {
+        Property p = repository.findByReference(ref)
+        .orElseThrow(() -> (new PropertyNotFoundException(ref)));
+
+        repository.delete(p);
     }
 }
