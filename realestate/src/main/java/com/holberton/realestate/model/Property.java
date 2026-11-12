@@ -1,8 +1,6 @@
 package com.holberton.realestate.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-import jakarta.validation.Valid;
 
 @Entity
 @Table(name = "properties")
