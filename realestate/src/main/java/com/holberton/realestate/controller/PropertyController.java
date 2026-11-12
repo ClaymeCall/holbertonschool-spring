@@ -8,6 +8,7 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import jakarta.validation.Valid;
 
@@ -35,32 +37,28 @@ public class PropertyController {
     }
 
     @GetMapping("/{reference}")
-    public ResponseEntity<PropertyResponse> findByReference(@PathVariable String reference) {
-        return service.findByReference(reference)
-        .map(ResponseEntity::ok)
-        .orElseGet(() -> ResponseEntity.notFound().build());
+    public PropertyResponse findByReference(@PathVariable String reference) {
+        return service.findByReference(reference);
     }
 
     @PostMapping
     public ResponseEntity<PropertyResponse> create(@Valid @RequestBody PropertyRequest request) {
-        return service.create(request)
-        .map(p -> ResponseEntity.created(URI.create("/api/properties/" + p.reference()))
-            .body(p))
-        .orElseGet(() -> ResponseEntity.status(409).build());
+        PropertyResponse created = service.create(request);
+
+        return ResponseEntity
+            .created(URI.create("/api/properties" + created.reference()))
+            .body(created);
     }
 
     @PutMapping("/{reference}")
-    public ResponseEntity<PropertyResponse> update(@PathVariable String reference,
+    public PropertyResponse update(@PathVariable String reference,
         @Valid @RequestBody PropertyRequest request) {
-        return service.update(reference, request)
-        .map(ResponseEntity::ok)
-        .orElseGet(() -> ResponseEntity.notFound().build());
+        return service.update(reference, request);
     }
 
     @DeleteMapping("/{reference}")
-    public ResponseEntity<Void> delete(@PathVariable String reference) {
-        return service.delete(reference)
-        ? ResponseEntity.noContent().build()
-        : ResponseEntity.notFound().build();
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable String reference) {
+        service.delete(reference);
     }
 }
