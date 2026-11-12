@@ -20,6 +20,10 @@ public class Property {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false) private EnergyClass energyClass;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    private Owner owner;
+
     protected Property() {}
 
     public Property(String reference, Address address, int surface, int monthlyRent,
@@ -50,4 +54,8 @@ public class Property {
     public EnergyClass getEnergyClass() { return energyClass; }
 
     public void setEnergyClass(EnergyClass energyClass) { this.energyClass = energyClass; }
+
+    public Owner getOwner() { return owner; }
+
+    public void setOwner(Owner owner) { this.owner = owner; }
 }
