@@ -1,5 +1,6 @@
 package com.holberton.realestate.controller;
 
+import com.holberton.realestate.dto.OwnerAssignmentRequest;
 import com.holberton.realestate.dto.PropertyRequest;
 import com.holberton.realestate.dto.PropertyResponse;
 import com.holberton.realestate.service.PropertyService;
@@ -54,6 +55,12 @@ public class PropertyController {
     public PropertyResponse update(@PathVariable String reference,
         @Valid @RequestBody PropertyRequest request) {
         return service.update(reference, request);
+    }
+
+    @PutMapping("/{reference}/owner")
+    public PropertyResponse assignOwner(@PathVariable String reference,
+            @Valid @RequestBody OwnerAssignmentRequest request) {
+        return service.assignOwner(reference, request.ownerId());
     }
 
     @DeleteMapping("/{reference}")
