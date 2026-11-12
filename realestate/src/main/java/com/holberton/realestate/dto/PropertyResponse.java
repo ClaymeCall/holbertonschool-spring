@@ -9,5 +9,6 @@ public record PropertyResponse(
     int surface,
     int monthlyRent,
     EnergyClass energyClass,
-    int annualRent
+    int annualRent,
+    Long ownerId
 ) {}
