@@ -36,6 +36,11 @@ public class LeaseController {
         return service.findById(id);
     }
 
+    @PostMapping("/{id}/end")
+    public LeaseResponse end(@PathVariable Long id) {
+        return service.end(id);
+    }
+
     @PostMapping
     public ResponseEntity<LeaseResponse> create(@Valid @RequestBody LeaseRequest request) {
         LeaseResponse created = service.create(request);

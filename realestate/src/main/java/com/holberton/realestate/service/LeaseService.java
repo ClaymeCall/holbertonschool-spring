@@ -4,6 +4,7 @@ import com.holberton.realestate.dto.LeaseMapper;
 import com.holberton.realestate.dto.LeaseRequest;
 import com.holberton.realestate.dto.LeaseResponse;
 import com.holberton.realestate.exception.InsufficientIncomeException;
+import com.holberton.realestate.exception.LeaseAlreadyEndedException;
 import com.holberton.realestate.exception.LeaseNotFoundException;
 import com.holberton.realestate.exception.PropertyNotFoundException;
 import com.holberton.realestate.exception.PropertyUnavailableException;
@@ -71,6 +72,22 @@ public class LeaseService {
         }
 
         Lease lease = new Lease(property, tenant, request.durationMonths(), property.getMonthlyRent());
+        Lease saved = repository.save(lease);
+        property.setRented(true);
+        propertyRepository.save(property);
+        return LeaseMapper.toResponse(saved);
+    }
+
+    @Transactional
+    public LeaseResponse end(Long id) {
+        Lease lease = repository.findById(id)
+            .orElseThrow(() -> new LeaseNotFoundException(id));
+        if (!lease.isActive()) {
+            throw new LeaseAlreadyEndedException(id);
+        }
+        lease.setActive(false);
+        lease.getProperty().setRented(false);
+        propertyRepository.save(lease.getProperty());
         return LeaseMapper.toResponse(repository.save(lease));
     }
 }
