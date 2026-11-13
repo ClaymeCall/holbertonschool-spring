@@ -16,6 +16,7 @@ public class Property {
 
     @Column(nullable = false) private int surface;
     @Column(nullable = false) private int monthlyRent;
+    @Column(nullable = false) private boolean rented;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false) private EnergyClass energyClass;
@@ -58,4 +59,8 @@ public class Property {
     public Owner getOwner() { return owner; }
 
     public void setOwner(Owner owner) { this.owner = owner; }
+
+    public boolean isRented() { return rented; }
+
+    public void setRented(boolean rented) { this.rented = rented; }
 }

@@ -14,7 +14,8 @@ public class PropertyMapper {
             p.getMonthlyRent(),
             p.getEnergyClass(),
             p.getMonthlyRent() * 12,
-            p.getOwner() == null ? null : p.getOwner().getId()
+            p.getOwner() == null ? null : p.getOwner().getId(),
+            p.isRented()
         );
     }
 
