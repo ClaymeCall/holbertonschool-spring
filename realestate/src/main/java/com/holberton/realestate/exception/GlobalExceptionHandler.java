@@ -63,6 +63,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(422), ex.getMessage());
     }
 
+    @ExceptionHandler(LeaseAlreadyEndedException.class)
+    public ProblemDetail handleAlreadyEnded(LeaseAlreadyEndedException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ExceptionHandler(PropertyHasLeasesException.class)
+    public ProblemDetail handleHasLeases(PropertyHasLeasesException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException  ex, HttpHeaders headers,

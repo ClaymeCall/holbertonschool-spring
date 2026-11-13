@@ -5,4 +5,5 @@ import com.holberton.realestate.model.Lease;
 
 public interface LeaseRepository extends JpaRepository<Lease, Long> {
     boolean existsByPropertyIdAndActiveTrue(Long propertyId);
+    boolean existsByPropertyId(Long propertyId);
 }
