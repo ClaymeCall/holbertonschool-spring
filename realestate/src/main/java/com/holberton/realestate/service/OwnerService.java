@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class OwnerService {
@@ -27,18 +28,21 @@ public class OwnerService {
         this.propertyRepository = propertyRepository;
     }
 
+    @Transactional(readOnly = true)
     public List<OwnerResponse> findAll() {
         return repository.findAll(Sort.by("name")).stream()
             .map(OwnerMapper::toResponse)
             .toList();
     }
 
+    @Transactional(readOnly = true)
     public OwnerResponse findById(Long id) {
         return repository.findById(id)
             .map(OwnerMapper::toResponse)
             .orElseThrow(() -> new OwnerNotFoundException(String.valueOf(id)));
     }
 
+    @Transactional(readOnly = true)
     public List<PropertyResponse> findProperties(Long id) {
         if (!repository.existsById(id)) {
             throw new OwnerNotFoundException(String.valueOf(id));
@@ -48,6 +52,7 @@ public class OwnerService {
             .toList();
     }
 
+    @Transactional
     public void delete(Long id) {
         Owner owner = repository.findById(id)
             .orElseThrow(() -> new OwnerNotFoundException(String.valueOf(id)));
@@ -57,6 +62,7 @@ public class OwnerService {
         repository.delete(owner);
     }
 
+    @Transactional
     public OwnerResponse create(OwnerRequest request) {
         if (repository.existsByEmail(request.email())) {
             throw new DuplicateEmailException(request.email());
